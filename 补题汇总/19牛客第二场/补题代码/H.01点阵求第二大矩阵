@@ -1,0 +1,113 @@
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef pair<int,int>pii;
+typedef vector<int>vi;
+  
+#define rep(i,a,b) for(int i=(a);i<(b);i++)
+#define fi first
+#define se second
+#define de(x) cout<<#x<<"="<<x<<endl;
+#define dd(x) cout<<#x<<"="<<x<<" " ;
+#define pb(x) push_back(x)
+#define per(i,a,b) for(int i=(b)-1;i>=(a);--i)
+#define y1 y777
+const int N=1000+5;
+char s[N][N];
+int n,m,num[N][N],h[N][N],l[N],r[N];
+int x1,x2,y1,y2;
+int solve(){
+    memset(h,0,sizeof(h));
+    rep(j,1,m+1){
+        rep(i,1,n+1){
+            if(num[i][j]==1){
+                h[i][j]=h[i-1][j]+1;
+            }
+            else h[i][j]=0;
+        }
+    }
+/*  rep(i,1,n+1){
+        rep(j,1,m+1){
+            cout<<h[i][j]<<" ";
+        }
+        cout<<endl;
+    }*/
+    stack<int>stk;
+    int res=0;
+    for(int i=n;i>=1;--i){
+        while(!stk.empty())stk.pop();
+        for(int j=1;j<=m;++j){
+            while(!stk.empty()&&h[i][stk.top()]>=h[i][j])stk.pop();
+            if(stk.empty())l[j]=1;
+            else{
+                l[j]=stk.top()+1;
+            }
+            stk.push(j);
+        }
+        while(!stk.empty())stk.pop();
+        for(int j=m;j>=1;--j){
+            while(!stk.empty()&&h[i][stk.top()]>=h[i][j])stk.pop();
+            if(stk.empty())r[j]=m;
+            else{
+                r[j]=stk.top()-1;
+            }
+            stk.push(j);
+        }
+    /*  cout<<"l："<<endl;
+        rep(j,1,m+1){
+            cout<<l[j]<<" ";
+        }
+        cout<<endl;
+        cout<<"r: "<<endl;
+        rep(j,1,m+1){
+            cout<<r[j]<<" ";
+        }
+        cout<<endl;
+        */
+        for(int j=1;j<=m;++j){
+            if(h[i][j]){
+                int W=r[j]-l[j]+1;
+                int H=h[i][j];
+                if(W*H>res){
+                    res=W*H;  
+                    x1=i-h[i][j]+1;
+                    y1=l[j];
+                    x2=i;
+                    y2=r[j];
+                }
+            }
+        }
+    }
+    return res;
+}
+int main()
+{
+  
+    scanf("%d%d",&n,&m);
+    rep(i,1,n+1)
+        scanf("%s",s[i]+1);
+    rep(i,1,n+1)
+        rep(j,1,m+1)
+            num[i][j]=s[i][j]-'0';
+           
+    solve();
+    int xx1,xx2,yy1,yy2;
+    xx1=x1;
+    xx2=x2;
+    yy1=y1;
+    yy2=y2;
+  
+    num[xx1][yy1]=0;
+    int ans=solve();
+      
+    num[xx1][yy1]=1;
+      
+      
+    num[xx2][yy2]=0;
+  
+    ans=max(ans,solve());
+    num[xx2][yy2]=1;
+      
+    printf("%d",ans);
+    return 0;
+}
