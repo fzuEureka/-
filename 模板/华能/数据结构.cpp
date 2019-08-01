@@ -236,3 +236,67 @@ int main(){
 	O(nlog2(n)+mlog2(n))*/
 }
 /*********************/
+
+
+//区间某k大之间求个数
+/*********************/
+const int N=2e5+5;
+
+vector<int> v;
+int a[N<<2];
+int rt[N<<2];
+ll tot;
+int d;
+int getid(int x) {return lower_bound(v.begin(),v.end(),x)-v.begin()+1;}
+int getid2(int x) {return upper_bound(v.begin(),v.end(),x)-v.begin()+1;}
+struct STZXTree{
+    #define qm (l+r)>>1 
+    struct node{ int l,r,sum; } T[N*40];
+    void build(int l,int r,int &x){
+        x=++tot;
+        T[x].sum=0;
+        if(l==r)return;
+        int m=(l+r)>>1;
+        build(l,m,T[x].l);
+        build(m+1,r,T[x].r);}
+    void updata(int l,int r,int &x,int y,int pos) {
+        tot++;
+        T[tot]=T[y];
+        T[tot].sum++;
+        x=tot;
+        if(l==r) return ;
+        int mid=qm;
+        if(pos<=mid) updata(l,mid,T[x].l,T[y].l,pos);
+        else updata(mid+1,r,T[x].r,T[y].r,pos);
+    }
+    
+    ll query(ll l,ll r,ll x,ll y,ll k) {
+        if(l==r) return l;
+        ll sum=T[T[y].l].sum-T[T[x].l].sum;
+        ll mid=qm;
+        if(k<=sum) return query(l,mid,T[x].l,T[y].l,k);
+        else return query(mid+1,r,T[x].r,T[y].r,k-sum);
+    }    
+    
+    void qry(int rt, int sub, int L, int R, int l, int r) {
+        if(rt==0&&sub==0) return ;
+        if(L <= l && r <= R) {
+            if(rt!=0)
+            d+=(T[rt].sum - T[sub].sum);
+            return ;
+        }
+        int mid = l + r >> 1;
+        if(L <= mid) qry(T[rt].l, T[sub].l,  L, R, l, mid);
+        if(R > mid) qry(T[rt].r, T[sub].r, L, R, mid + 1, r);
+    }
+}SST;
+int l1,r1,k,hh,p;
+bool check(int x){
+    d=0;
+    int l2=getid(p-x);
+    int r2=getid2(p+x)-1;
+      SST.qry( rt[r1], rt[l1-1], l2, r2, 1, hh ); 
+    if(d>=k)return true;
+    return false;
+}
+/*********************/
